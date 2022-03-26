@@ -3,9 +3,9 @@ $(document).ready(function () {
     let anio = $("#anio").val();
     res = anio % 100 === 0 ? anio % 400 === 0 : anio % 4 === 0;
     if (res) {
-      $("#res").text("Año bisiesto").addClass("text-success");
+      $("#res").text("Año bisiesto");
     } else {
-      $("#res").text("Año no bisiesto").addClass("text-danger");
+      $("#res").text("Año no bisiesto");
     }
   });
 
@@ -61,37 +61,63 @@ $(document).ready(function () {
     let B = Array.from({ length: 10 }, () =>
       characters.charAt(Math.floor(Math.random() * characters.length))
     );
+
+    const setB = new Set(B),
+      setA = new Set(A);
+
     let union = [...new Set([...A, ...B])];
-    let intersect = new Set([...A].filter((value) => B.includes(value)));
+    let intersect = [...new Set([...A].filter((value) => B.includes(value)))];
     let except = A.filter((value) => !B.includes(value));
-    let symmetricDifference = new Set(
-      [...union].filter((x) => !intersect.has(x))
-    );
-    alert(symmetricDifference);
+    let symmetricDifference = [
+      ...A.filter((x) => setB.has(x), ...B.filter((x) => !setA.has(x))),
+    ];
+
+    $("#A").text(A);
+    $("#B").text(B);
+    $("#union").text(union);
+    $("#inter").text(intersect);
+    $("#except").text(except);
+    $("#diff").text(symmetricDifference);
   });
 
-  $("#tipoCambio").click(function () {
-    $.ajax({
-      url: "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SP74665,SF61745,SF60634,SF43773/datos/oportuno?token=4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d",
-      dataType: "jsonp", //Se utiliza JSONP para realizar la consulta cross-site
-      success: function (response) {
-        //Handler de la respuesta
-        var series = response.bmx.series;
+  function tipoCambio() {
 
+    var myUrl = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936/datos/2022-03-23/2022-03-25";
+    var proxy = "https://cors-anywhere.herokuapp.com/";
+
+    $.ajax({
+      url: proxy + myUrl,
+      method: "GET",
+      jsonp: "callback",
+      dataType: "jsonp",
+      async: true,
+      crossDomain: true,
+      contentType: 'application/json',
+      headers: {
+        "accept": "application/json",
+        "Access-Control-Allow-Origin":"*",
+        "Bmx-Token":
+          "4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d",
+      },
+      success: function (response) {
+        var series = response.bmx.series;
         //Se carga una tabla con los registros obtenidos
+
         for (var i in series) {
           var serie = series[i];
-          var reg =
-            "" +
-            serie.titulo +
-            "" +
-            serie.datos[0].fecha +
-            "" +
-            serie.datos[0].dato +
-            "";
-          $("#result").append(reg);
         }
+
+        $("#result > thead").append("<td>" + serie.titulo + "</td>");
+        $("#result > tbody").append(
+          "<td>" +
+            serie.datos[0].fecha +
+            "<td>" +
+            serie.datos[0].dato +
+            "</td> </td>"
+        );
       },
     });
-  });
+  }
+
+  $(document).ready(tipoCambio);
 });
