@@ -81,17 +81,43 @@ $(document).ready(function () {
   });
 
   function tipoCambio() {
+    var dt = new Date();
+    dt.setDate(dt.getDate() - 5);
+
+    var ff = new Date();
+    ff.setDate(ff.getDate());
+
+    function formatDate(date) {
+      var d = new Date(date),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+
+      if (month.length < 2) month = "0" + month;
+      if (day.length < 2) day = "0" + day;
+
+      return [year, month, day].join("-");
+    }
 
     $.ajax({
-      url: "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936/datos/2022-03-23/2022-03-25",
+      url: "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936/datos",
       method: "GET",
+      data: {
+        data: { 
+          FechaIni: formatDate(ff), 
+          FechaFin: formatDate(dt)
+        },
+      },
       jsonp: "callback",
       dataType: "jsonp",
       async: true,
       crossDomain: true,
-      Accepts: 'application/json',
-      beforeSend: function(request) {
-        request.setRequestHeader("Bmx-Token", "4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d");
+      Accepts: "application/json",
+      beforeSend: function (request) {
+        request.setRequestHeader(
+          "Bmx-Token",
+          "4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d"
+        );
       },
       success: function (response) {
         var series = response.bmx.series;
