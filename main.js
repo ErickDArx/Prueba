@@ -82,22 +82,16 @@ $(document).ready(function () {
 
   function tipoCambio() {
 
-    var myUrl = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936/datos/2022-03-23/2022-03-25";
-    var proxy = "https://cors-anywhere.herokuapp.com/";
-
     $.ajax({
-      url: proxy + myUrl,
+      url: "https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43936/datos/2022-03-23/2022-03-25",
       method: "GET",
       jsonp: "callback",
       dataType: "jsonp",
       async: true,
       crossDomain: true,
-      contentType: 'application/json',
-      headers: {
-        "accept": "application/json",
-        "Access-Control-Allow-Origin":"*",
-        "Bmx-Token":
-          "4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d",
+      Accepts: 'application/json',
+      beforeSend: function(request) {
+        request.setRequestHeader("Bmx-Token", "4768e9e0708c1401328864afd3f9a09b3af08c6106f471cc9caa072ef194ed0d");
       },
       success: function (response) {
         var series = response.bmx.series;
@@ -118,6 +112,5 @@ $(document).ready(function () {
       },
     });
   }
-
   $(document).ready(tipoCambio);
 });
